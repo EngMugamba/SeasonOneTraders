@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Season One Traders — Fresh Juices (Nakuru)</title>
+<link rel="icon" type="image/png" href="images/logo.png">
+
+
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<!-- jsPDF for PDF receipts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+:root{
+  /* Increased spacing and slightly larger default font-size */
+  --gap: 56px;
+  --card-gap: 28px;
+  --black:#0b0b0b; --white:#fff; --yellow:#FFD74A; --green:#1f7a56; --muted:#6b6f73;
+  --card-shadow: 0 24px 60px rgba(11,11,11,0.10);
+  --radius:18px; --content-width:1200px;
+  --footer-bg: linear-gradient(180deg,#0f4f3f,#153b2f);
+  --section-hover-shadow: 0 30px 80px rgba(11,11,11,0.12);
+  --section-hover-translate: -8px;
+}
+
+/* Reset & base */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;padding:0}
+body{
+  margin:0;font-family:Poppins,system-ui,Arial,Helvetica;color:var(--black);
+  background:linear-gradient(180deg,#fbfbfb 0%, #fff 60%);position:relative;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  font-size:18px; /* bigger base font */
+  line-height:1.55;
+
+  /* reserve space so fixed header doesn't overlap content */
+  padding-top:84px;
+}
+
+/* subtle blurred background image */
+body::before{content:'';position:fixed;inset:0;z-index:0;
+  background-image:url('https://images.unsplash.com/photo-1502741126161-b048400d6f5d?auto=format&fit=crop&w=1920&q=60');
+  background-size:cover;background-position:center;filter: blur(14px) saturate(90%);opacity:0.10;transform:scale(1.03);pointer-events:none}
+body::after{content:'';position:fixed;inset:0;z-index:0;background:linear-gradient(180deg, rgba(255,247,202,0.06), rgba(233,255,239,0.06));pointer-events:none}
+
+/* TOP NAV — full width colored band */
+/* CHANGED: make fixed so it remains intact while navigating */
+.topband {
+  width:100%;
+  background: linear-gradient(90deg,var(--yellow),var(--green));
+  padding:18px 0;
+  position:fixed;      /* changed from sticky to fixed */
+  top:0;
+  left:0;
+  z-index:120;
+  box-shadow:0 8px 26px rgba(0,0,0,0.07);
+}
+.topband .inner {
+  max-width:var(--content-width);
+  margin:0 auto;
+  padding:0 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.brand h1{margin:0;font-family:Merriweather;color:var(--black);font-size:1.5rem}
+.tag{font-size:1rem;color:rgba(0,0,0,0.85)}
+.toplinks{display:flex;gap:12px;align-items:center}
+.toplinks a{
+  display:inline-block;padding:10px 14px;border-radius:12px;text-decoration:none;color:var(--black);
+  background:rgba(255,255,255,0.8);font-weight:700;border:1px solid rgba(0,0,0,0.06);
+  box-shadow:0 8px 24px rgba(0,0,0,0.04);
+}
+.toplinks a:hover{transform:translateY(-3px);transition:transform .14s}
+
+/* page container */
+.page{position:relative;z-index:2;max-width:var(--content-width);margin:calc(var(--gap) * 0.8) auto;padding:0 18px 64px}
+
+/* section common styles: larger padding, spacing and hover effect */
+.section {
+  padding:36px;
+  margin-bottom:calc(var(--gap) * 0.8);
+  border-radius:16px;
+  background:rgba(255,255,255,0.96);
+  transition:transform .18s ease, box-shadow .18s ease;
+  box-shadow:0 18px 42px rgba(11,11,11,0.06);
+}
+.section:hover{
+  transform:translateY(var(--section-hover-translate));
+  box-shadow:var(--section-hover-shadow);
+}
+
+/* hero */
+.hero{display:flex;flex-direction:column;gap:calc(var(--gap) * 0.35);align-items:center;border-radius:16px;padding:48px;background:linear-gradient(135deg, #FFF9D8, #DFF6E6);}
+.hero-logo img{max-width:240px;height:auto;border-radius:12px}
+.hero-copy{max-width:820px;text-align:center}
+.hero-copy h2{font-family:Merriweather;margin:0 0 12px 0;font-size:2.25rem}
+.lead{color:var(--muted);font-size:1.05rem;line-height:1.7}
+
+/* menu area */
+.menu-section{padding:34px}
+.menu-title{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.menu{display:grid;grid-template-columns:repeat(1,1fr);gap:26px;margin-top:22px}
+@media(min-width:700px){ .menu{grid-template-columns:repeat(2,1fr)} }
+@media(min-width:1200px){ .menu{grid-template-columns:repeat(2,1fr);max-width:1200px} }
+
+/* item card */
+.item{background:#fff;border-radius:16px;padding:22px;border:1px solid #f3f3f3;box-shadow:0 20px 48px rgba(11,11,11,0.06);display:flex;flex-direction:column;gap:14px;min-height:440px}
+.media{height:240px;padding:8px;border-radius:12px;border:1px solid #f0f0f0;background:#fff;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.media img{width:100%;height:100%;object-fit:cover;border-radius:12px;cursor:zoom-in}
+.info{display:flex;flex-direction:column;gap:12px}
+.top-row{display:flex;justify-content:space-between;align-items:center}
+.price{color:var(--green);font-weight:900;font-size:1.1rem}
+.desc{color:var(--muted);font-size:1rem}
+.recipe{color:var(--muted);font-size:0.98rem;font-style:italic}
+
+/* extras */
+.extras{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.extra{display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;background:#fafafa;border:1px solid #f0f0f0;min-width:140px}
+.extra img{width:48px;height:48px;border-radius:10px;object-fit:cover}
+.extra span{font-weight:700;color:var(--muted)}
+
+/* chooser */
+.controls{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:auto}
+.amount-wrap{display:flex;flex-direction:column;gap:8px}
+.amount-row{display:flex;gap:10px;align-items:center}
+input[type=range]{width:200px}
+input[type=number].amt{width:110px;padding:10px;border-radius:10px;border:1px solid #eee;text-align:center;font-size:1rem}
+.qty{width:96px;padding:10px;border-radius:10px;border:1px solid #eee;text-align:center;font-size:1rem}
+
+/* cartbar */
+/* add animation classes and hidden/visible states */
+.cartbar{
+  position:fixed;right:22px;bottom:22px;background:var(--white);box-shadow:0 36px 80px rgba(11,11,11,0.16);border-radius:18px;overflow:hidden;width:460px;z-index:140;
+  transform: translateY(18px) scale(.98);
+  opacity: 0;
+  transition: transform .38s cubic-bezier(.2,.9,.2,1), opacity .28s ease;
+  pointer-events: none;
+}
+.cartbar.visible{
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+.cartbar.hidden{
+  transform: translateY(28px) scale(.96);
+  opacity: 0;
+  pointer-events: none;
+}
+.cartbar header{background:var(--green);color:#fff;padding:14px 16px;font-weight:800;display:flex;justify-content:space-between;align-items:center;font-size:1.05rem}
+.cartbar .header-right{display:flex;gap:12px;align-items:center}
+.cart-items{max-height:380px;overflow:auto;padding:16px}
+.cart-items .row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f6f6f6}
+.cart-footer{display:flex;justify-content:space-between;padding:14px;border-top:1px solid #f3f3f3}
+.place-order-btn{background:var(--black);color:#fff;padding:12px 14px;border-radius:12px;border:0;cursor:pointer;font-weight:900}
+
+/* close button style */
+.cart-close-btn{
+  background:transparent;border:0;color:#fff;font-size:18px;cursor:pointer;padding:6px 8px;border-radius:6px;
+}
+.cart-close-btn:hover{background:rgba(255,255,255,0.06)}
+
+/* founders / partners */
+.about{padding:34px}
+.team{display:flex;gap:28px;flex-wrap:wrap;margin-top:18px}
+.person{display:flex;gap:18px;align-items:center;padding:18px;background:#fff;border-radius:12px;box-shadow:0 12px 28px rgba(11,11,11,0.06);min-width:320px}
+.person img{width:220px;height:220px;object-fit:cover;border-radius:12px;border:3px solid rgba(255,215,74,0.12)}
+.person .meta .name{font-weight:800;font-size:1.1rem}
+.person .meta .role{color:var(--muted)}
+
+/* partners badges */
+.partners{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.partner {background:rgba(0,0,0,0.04);padding:12px 14px;border-radius:12px;display:flex;align-items:center;gap:12px}
+.partner img{width:120px;height:120px;border-radius:8px;object-fit:cover}
+
+/* client commitment section */
+.commitment{padding:34px}
+.commitment h3{margin:0 0 8px 0;font-family:Merriweather;font-size:1.4rem}
+.commitment p{margin:0;color:var(--muted);font-size:1.02rem}
+
+/* help section */
+.help{padding:34px;border-radius:12px}
+.help h3{font-family:Merriweather;font-size:1.35rem;margin:0 0 8px 0}
+.help p{margin:0 0 8px 0;color:var(--muted);font-size:1.02rem}
+
+/* footer */
+.footer { box-sizing:border-box; width:100%; background:var(--footer-bg); color:#fff; padding:56px 0; margin-top:36px; box-shadow:0 -8px 30px rgba(10,10,10,0.12); position:relative; display:block; clear:both; min-height:25vh; }
+.footer-container { width:100%; max-width:1200px; margin:0 auto; padding:0 20px; display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:28px; align-items:start; }
+.footer .footer-section h3{ margin:0 0 12px 0; font-family:Merriweather; font-size:1.15rem; }
+
+/* utilities */
+.small{font-size:0.98rem;color:var(--muted)}
+.btn{background:var(--black);color:#fff;padding:10px 12px;border-radius:10px;border:0;cursor:pointer;font-weight:700}
+.btn.secondary{background:transparent;border:1px solid rgba(0,0,0,0.08);color:var(--black)}
+
+@media(max-width:700px){
+  body{font-size:16px}
+  .cartbar{right:12px;left:12px;width:auto}
+  .person img{width:160px;height:160px}
+  .partner img{width:80px;height:80px}
+  .hero-copy h2{font-size:1.6rem}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="topband" role="banner">
+  <div class="inner">
+    <div style="display:flex;gap:12px;align-items:center">
+      <div class="brand"><h1>Season One Traders</h1><div class="tag">Fresh Juices • Nakuru City</div></div>
+    </div>
+    <div class="toplinks" role="navigation" aria-label="Main">
+      <a href="#menu" onclick="goto('menu')">Menu</a>
+      <a href="#about" onclick="goto('about')">About</a>
+      <a href="#commitment" onclick="goto('commitment')">Our Commitment</a>
+      <a href="#help" onclick="goto('help')">Help</a>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- HERO -->
+  <section class="section hero" id="hero">
+    <div class="hero-logo"><img src="images/logo.png" alt="Season One Logo"></div>
+    <div class="hero-copy">
+      <h2>Fresh, Local, Affordable</h2>
+      <p class="lead"><strong>Our Story:</strong> Season One Traders began as a small stall near Jamaa Supermarket in Nakuru. We press fresh fruit daily — sugarcane, pineapple, mango and banana — and offer optional add-ins like beetroot, aloe vera, ginger, garlic and lemon. We value our customers and aim to serve with care.</p>
+      <div style="margin-top:18px;display:flex;gap:14px;justify-content:center">
+        <button class="btn" onclick="goto('menu')">See Menu</button>
+        <button class="btn secondary" onclick="openCart()">Order</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENU -->
+  <section id="menu" class="section menu-section" aria-labelledby="menu-heading">
+    <div class="menu-title">
+      <h2 id="menu-heading" style="font-family:Merriweather;margin:0;font-size:1.6rem">Menu — Available Offers</h2>
+      <div class="small">Choose amount, qty and optional add-ins. Banana Smoothie has no extras.</div>
+    </div>
+
+    <div class="menu" id="menuGrid" aria-live="polite"></div>
+
+    <!-- quick contacts added to menu section -->
+    <div style="margin-top:20px;border-top:1px dashed #eee;padding-top:16px;display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+      <div style="font-weight:700">Contact for orders:</div>
+      <div class="small">Call: <a href="tel:+254750236497" style="color:var(--green);text-decoration:none">+254 750 236 497</a></div>
+      <div class="small">Alt: <a href="tel:+254712345678" style="color:var(--green);text-decoration:none">+254 788 368 233</a></div>
+      <div class="small">Email: <a href="mailto:adhuali998@gmail.com" style="color:var(--green);text-decoration:none">adhuali998@gmail.com</a></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="section about" aria-labelledby="about-heading">
+    <h2 id="about-heading" style="margin:0 0 10px 0;font-family:Merriweather;font-size:1.6rem">About & How We Make Juice</h2>
+    <p class="small">We press fruit daily using hygienic cold-press methods, strain where needed and serve chilled. Optional add-ins are prepared fresh on request. We pay attention to quality, hygiene and fairness to our suppliers.</p>
+
+    <h3 style="margin-top:20px">Founders</h3>
+    <div class="team">
+      <div class="person">
+        <img src="images\Gedion.jpg" alt="Gedion Omariba">
+        <div class="meta">
+          <div class="name">Gedion Omariba</div>
+          <div class="role small">Founder • Juice Chef</div>
+          <div class="small" style="margin-top:8px">Leads recipes and pressing; sugarcane specialist.</div>
+        </div>
+      </div>
+
+      <div class="person">
+        <img src="images/Ali1.jpg" alt="Abdhu Ali">
+        <div class="meta">
+          <div class="name">Abdhu Ali</div>
+          <div class="role small">Partner • Operations</div>
+          <div class="small" style="margin-top:8px">Handles supply, orders and customer care.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- about contacts -->
+    <div style="margin-top:20px;border-top:1px dashed #eee;padding-top:16px;display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+      <div style="font-weight:700">Contact:</div>
+      <div class="small">Call: <a href="tel:+254750236497" style="color:var(--green);text-decoration:none">+254 750 236 497</a></div>
+      <div class="small">Alt: <a href="tel:+254712345678" style="color:var(--green);text-decoration:none">+254 788 368 233</a></div>
+      <div class="small">Customer care: <a href="mailto:adhuali998@gmail.com" style="color:var(--green);text-decoration:none">adhuali998@gmail.com</a></div>
+    </div>
+  </section>
+
+  <!-- OUR COMMITMENT -->
+  <section id="commitment" class="section commitment" aria-labelledby="commitment-heading">
+    <h3 id="commitment-heading">Our Commitment — How We Value Our Clients</h3>
+    <p>At Season One Traders we believe every customer is part of our family. We source the freshest local fruit, keep our preparation hygienic, and listen to your feedback. If there's ever an issue with your order, we handle it quickly and respectfully — because your trust and satisfaction matter most to us.</p>
+
+    <div style="margin-top:16px;font-weight:700">Customer care: <a href="mailto:adhuali998@gmail.com" style="color:var(--green);text-decoration:none">adhuali998@gmail.com</a></div>
+
+    <div style="margin-top:16px;border-top:1px dashed #eee;padding-top:12px;display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+      <div class="small">Call to order: <a href="tel:+254750236497" style="color:var(--green);text-decoration:none">+254 750 236 497</a></div>
+      <div class="small">Alternate: <a href="tel:+254712345678" style="color:var(--green);text-decoration:none">+254 788 368 233</a></div>
+    </div>
+  </section>
+
+  <!-- HELP (contacts & support) -->
+  <section id="help" class="section help" aria-labelledby="help-heading">
+    <h3 id="help-heading">Help & Contact</h3>
+    <p class="small">Need help with an order, refund or feedback? Use the contacts below — we're here to help.</p>
+
+    <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+      <div class="small"><strong>Email:</strong> <a href="mailto:adhuali998@gmail.com" style="color:var(--green);text-decoration:none">adhuali998@gmail.com</a></div>
+      <div class="small"><strong>Phone (primary):</strong> <a href="tel:+254750236497" style="color:var(--green);text-decoration:none">+254 750 236 497</a></div>
+      <div class="small"><strong>Phone (alternate):</strong> <a href="tel:+254712345678" style="color:var(--green);text-decoration:none">+254 788 368 233</a></div>
+      <div class="small">Hours: Mon–Sun 7:00 — 20:00</div>
+    </div>
+  </section>
+
+  <!-- PARTNERS (ADDED below Help) -->
+  <section id="partners" class="section" aria-labelledby="partners-heading">
+    <h3 id="partners-heading" style="font-family:Merriweather;font-size:1.4rem;margin:0 0 12px 0">Our Partners</h3>
+    <p class="small">We work closely with local farmers, distributors and market networks to bring you fresh, affordable juice every day.</p>
+    <div class="partners" style="margin-top:14px">
+      <div class="partner"><img src="images/farmer.jpg" alt="Partner A"><div style="margin-left:8px">Local Farmers Coop</div></div>
+      <div class="partner"><img src="images/retail.jpeg" alt="Partner B"><div style="margin-left:8px">Retail Distributors</div></div>
+      <div class="partner"><img src="images/stall.jpg" alt="Partner C"><div style="margin-left:8px">Market Stall Network</div></div>
+    </div>
+  </section>
+
+</div> <!-- end .page -->
+
+<!-- CARTBAR -->
+<div class="cartbar hidden" id="cartbar" role="region" aria-label="Cart">
+  <header>
+    <div>Cart</div>
+    <div class="header-right">
+      <div><span id="count">0</span> items</div>
+      <!-- CLOSE BUTTON ADDED -->
+      <button class="cart-close-btn" id="cartCloseBtn" title="Close cart" aria-label="Close cart">✕</button>
+    </div>
+  </header>
+
+  <div class="cart-items" id="cartItems"><div style="padding:14px;color:var(--muted)">Cart is empty</div></div>
+
+  <div class="cart-footer">
+    <div style="font-weight:900">Total KSh <span id="total">0</span></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="btn" onclick="generatePDF()">Download PDF</button>
+      <button class="place-order-btn" id="placeOrderBtn" onclick="placeOrderFromCart()">Make Order</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer" role="contentinfo" aria-labelledby="footer-heading">
+  <div class="footer-container">
+    <div class="footer-section">
+      <h3 id="footer-heading">Season One Traders</h3>
+      <p>Freshly-pressed juices made daily in Nakuru. Local fruit, minimal processing, optional healthy add-ins.</p>
+      <div style="margin-top:12px; display:flex; gap:12px; align-items:center;">
+        <div style="width:56px;height:56px;border-radius:10px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-weight:800">S1</div>
+        <div style="font-size:0.95rem;color:rgba(255,255,255,0.9)"><strong>Call:</strong> <a href="tel:+254750236497" style="color:#fff;text-decoration:underline">+254 750 236 497</a></div>
+      </div>
+    </div>
+
+    <div class="footer-section">
+      <h3>Our Story & Purpose</h3>
+      <ul style="list-style:none;padding:0;margin:0">
+        <li style="margin-bottom:8px;color:rgba(255,255,255,0.92)">We press and serve local fruit with care.</li>
+        <li style="margin-bottom:8px;color:rgba(255,255,255,0.92)">We support local farmers and fair prices.</li>
+        <li style="margin-bottom:8px;color:rgba(255,255,255,0.92)">Customer care: <a href="mailto:adhuali998@gmail.com" style="color:rgba(255,255,255,0.92);text-decoration:underline">adhuali998@gmail.com</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-section">
+      <h3>Contact & Social</h3>
+      <p style="margin-bottom:8px"><strong>Email:</strong> adhuali998@gmail.com</p>
+      <p style="margin-bottom:8px"><strong>Phone:</strong> +254 750 236 497</p>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <a href="#" style="display:inline-flex;width:40px;height:40px;border-radius:8px;background:rgba(255,255,255,0.08);align-items:center;justify-content:center;text-decoration:none;color:#fff">F</a>
+        <a href="#" style="display:inline-flex;width:40px;height:40px;border-radius:8px;background:rgba(255,255,255,0.08);align-items:center;justify-content:center;text-decoration:none;color:#fff">W</a>
+        <a href="#" style="display:inline-flex;width:40px;height:40px;border-radius:8px;background:rgba(255,255,255,0.08);align-items:center;justify-content:center;text-decoration:none;color:#fff">I</a>
+      </div>
+    </div>
+
+    <div style="grid-column: 1 / -1; margin-top:18px;">
+      <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:14px;display:flex;justify-content:space-between;color:rgba(255,255,255,0.75)">
+        <div>© 2025 Season One Traders • Nakuru City</div>
+        <div>Made with care • <a href="#about" onclick="goto('about')" style="color:rgba(255,255,255,0.85);text-decoration:underline">About</a></div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- order confirmation modal -->
+<div id="orderModal" role="dialog" aria-live="polite">
+  <div class="box" role="document" style="width:min(720px,92%);background:#fff;border-radius:14px;padding:26px;box-shadow:0 30px 80px rgba(0,0,0,0.4);text-align:center;">
+    <h2 style="margin:0 0 10px 0;font-family:Merriweather">Order placed successfully</h2>
+    <p style="margin:8px 0;color:var(--muted);font-size:1rem">Your order was received. A receipt PDF was created for you — please save or print it.</p>
+    <p class="call" style="font-weight:900;color:var(--green);font-size:1.05rem;margin-top:8px">To complete the order call: <a href="tel:+254750236497">074 595 5707</a></p>
+    <p style="margin-top:8px;color:var(--muted)">This message will remain on screen for 30 seconds.</p>
+    <button class="closeBtn" onclick="closeOrderModal()" style="margin-top:18px;padding:10px 14px;border-radius:10px;border:0;background:var(--black);color:#fff;cursor:pointer;font-weight:800">Close</button>
+  </div>
+</div>
+
+<!-- lightbox -->
+<div id="lightbox" onclick="closeLightbox()" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:200"><img id="lightboxImg" src="" alt="preview" style="max-width:92%;max-height:88%;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6)"></div>
+
+<!-- popup -->
+<div id="popup" role="status" aria-live="polite" style="position:fixed;left:50%;transform:translateX(-50%);bottom:34px;background:var(--green);color:#fff;padding:14px 20px;border-radius:12px;display:none;z-index:250;box-shadow:0 28px 48px rgba(0,0,0,0.22)"></div>
+
+<script>
+/* ================== Data: items & extras ================== */
+const ITEMS = [
+  { id:'sugarcane', name:'Sugarcane Juice', suggested:20, available:true,
+    img:'images/Sugarcane.jpg',
+    desc:'Fresh-pressed sugarcane — light and naturally sweet.',
+    recipe:'Cold-pressed sugarcane stalks, strained, served chilled.',
+    noExtras:false
+  },
+  { id:'pineapple', name:'Pineapple Juice', suggested:60, available:true,
+    img:'images/pineapple.jpg',
+    desc:'Tangy, bright pineapple — strained and chilled.',
+    recipe:'Ripe pineapple pressed and strained for a smooth, tangy juice.',
+    noExtras:false
+  },
+  { id:'mango', name:'Mango Juice', suggested:80, available:true,
+    img:'images/mango.webp',
+    desc:'Silky mango nectar from ripe fruit.',
+    recipe:'Ripe mango blended and strained to create a silky nectar.',
+    noExtras:false
+  },
+  { id:'banana', name:'Banana Smoothie', suggested:60, available:true,
+    img:'images/Banana-Mango-Smoothie-14.jpg',
+    desc:'Creamy banana smoothie — filling and sweet.',
+    recipe:'Banana blended with milk (or water) for a creamy smoothie.',
+    noExtras:true
+  }
+];
+
+const EXTRAS = [
+  { id:'beetroot', name:'Beetroot', img:'images/beetroot.jpeg', note:'Adds earthy sweetness and color' },
+  { id:'aloevera', name:'Aloe Vera', img:'images/Aloe Vera.webp', note:'Soothing, subtle flavor' },
+  { id:'ginger', name:'Ginger', img:'images/ginger.avif', note:'Zesty kick, good for digestion' },
+  { id:'garlic', name:'Garlic', img:'images/garlic.jpeg', note:'Strong, savory — optional for health blends' },
+  { id:'lemon', name:'Lemon', img:'images/lemon.jpg', note:'Bright citrus lift' }
+];
+
+/* ================ Cart (localStorage) ================ */
+const KEY = 'season1_cart_v7';
+let cart = JSON.parse(localStorage.getItem(KEY) || '{}');
+
+/* updated save() to show/hide cartbar when cart has items */
+function save(){ localStorage.setItem(KEY, JSON.stringify(cart)); renderCart(); manageCartbarVisibility(); }
+
+/* utility to manage cartbar showing/hiding with animation */
+function manageCartbarVisibility(){
+  const cartbar = document.getElementById('cartbar');
+  const keys = Object.keys(cart);
+  if(!cartbar) return;
+  if(keys.length){
+    cartbar.classList.remove('hidden');
+    // small delay to allow CSS transitions
+    setTimeout(()=>cartbar.classList.add('visible'), 20);
+  } else {
+    // hide gracefully
+    cartbar.classList.remove('visible');
+    // after animation, mark hidden
+    setTimeout(()=>cartbar.classList.add('hidden'), 320);
+  }
+}
+
+/* ================ Render available items (responsive) ================ */
+const grid = document.getElementById('menuGrid');
+
+function render(){
+  grid.innerHTML = '';
+  ITEMS.filter(i => i.available).forEach(it => {
+    const el = document.createElement('div'); el.className = 'item';
+    const extrasHtml = it.noExtras ? '' : EXTRAS.map(ex => `
+      <label class="extra" title="${ex.note}">
+        <input type="checkbox" class="extra-checkbox" data-extra="${ex.id}" data-name="${ex.name}" style="width:18px;height:18px" />
+        <img src="${ex.img}" alt="${ex.name}" />
+        <span>${ex.name}</span>
+      </label>`).join('');
+
+    el.innerHTML = `
+      <div class="media"><img src="${it.img}" alt="${it.name}" loading="lazy" data-id="${it.id}"></div>
+      <div class="info">
+        <div class="top-row"><div><strong style="font-size:1.05rem">${it.name}</strong></div><div class="price">KSh ${it.suggested}</div></div>
+        <div class="desc">${it.desc}</div>
+        <div class="recipe">${it.recipe}</div>
+        ${ it.noExtras ? '' : `<div style="margin-top:12px"><div class="small">Optional add-ins (tick to include)</div><div class="extras">${extrasHtml}</div></div>` }
+        <div class="controls">
+          <div class="amount-wrap">
+            <div class="small">Amount (KSh) — multiples of 20</div>
+            <div class="amount-row">
+              <input type="range" id="amt-${it.id}" min="20" max="1000" value="${it.suggested}" step="20" aria-label="Choose amount">
+              <input type="number" class="amt" id="amtnum-${it.id}" min="20" max="1000" step="20" value="${it.suggested}">
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
+            <input class="qty" id="q-${it.id}" type="number" min="1" value="1">
+            <div style="display:flex;gap:10px">
+              <button class="btn" onclick="addWithExtras('${it.id}', this)">Add</button>
+              <button class="btn secondary" onclick="previewImage('${it.img}')">Preview</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    grid.appendChild(el);
+
+    // wire amount sync
+    const range = document.getElementById('amt-'+it.id);
+    const num = document.getElementById('amtnum-'+it.id);
+    range.addEventListener('input', ()=>{ num.value = range.value; });
+    num.addEventListener('change', ()=>{ let v=parseInt(num.value||0); if(isNaN(v)) v=it.suggested; v = Math.max(20, Math.min(1000, Math.round(v/20)*20)); num.value=v; range.value=v; });
+  });
+}
+
+/* ================ Add to cart (with extras) ================ */
+function addWithExtras(id, btn){
+  const item = ITEMS.find(x=>x.id === id);
+  const qtyElem = document.getElementById('q-'+id);
+  const amtElem = document.getElementById('amtnum-'+id);
+  const parent = btn.closest('.item');
+  const checkedExtras = item.noExtras ? [] : Array.from(parent.querySelectorAll('.extra-checkbox:checked')).map(ch => ({ id: ch.dataset.extra, name: ch.dataset.name }));
+  let qty = Math.max(1, parseInt(qtyElem?.value||1));
+  let amount = parseInt(amtElem?.value||item.suggested);
+  if(isNaN(amount)) amount = item.suggested;
+  amount = Math.max(20, Math.min(1000, Math.round(amount/20)*20));
+  const now = new Date().toISOString();
+
+  const extrasKey = checkedExtras.map(e=>e.id).sort().join('|');
+  const cartKey = extrasKey ? `${id}::${extrasKey}` : id;
+
+  const entry = { id: item.id, cartKey, name: item.name, price: amount, qty, img: item.img, extras: checkedExtras, addedAt: now };
+
+  if(!cart[cartKey]) cart[cartKey] = entry;
+  else { cart[cartKey].qty += qty; cart[cartKey].price = amount; cart[cartKey].addedAt = now; }
+
+  save();
+  if(qtyElem) qtyElem.value = 1;
+  flashCart();
+}
+
+/* ================ Cart rendering & actions ================ */
+function renderCart(){
+  const el = document.getElementById('cartItems');
+  const count = document.getElementById('count');
+  const totalEl = document.getElementById('total');
+  const keys = Object.keys(cart);
+  if(!keys.length){
+    el.innerHTML = '<div style="padding:14px;color:var(--muted)">Cart is empty</div>';
+    count.textContent = 0; totalEl.textContent = 0; return;
+  }
+  let html = '', total = 0, totalQty = 0;
+  keys.forEach(k=>{
+    const it = cart[k];
+    const sub = it.qty * it.price;
+    total += sub; totalQty += it.qty;
+    const extrasText = (it.extras && it.extras.length) ? `<div class="small">Extras: ${it.extras.map(e=>e.name).join(', ')}</div>` : '';
+    html += `
+      <div class="row">
+        <div style="display:flex;gap:12px;align-items:center">
+          <img src="${it.img}" alt="${it.name}" style="width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid #eee">
+          <div>
+            <strong>${it.name}</strong>
+            <div class="small">KSh ${it.price} x ${it.qty}</div>
+            ${extrasText}
+            <div class="small">Added: ${new Date(it.addedAt).toLocaleString()}</div>
+          </div>
+        </div>
+        <div style="text-align:right;min-width:140px">
+          <div style="font-weight:800">KSh ${sub}</div>
+          <div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn" onclick="decr('${k}')">-</button>
+            <button class="btn" onclick="incr('${k}')">+</button>
+            <button class="btn secondary" onclick="removeItem('${k}')" style="margin-left:6px">Remove</button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  el.innerHTML = html;
+  count.textContent = totalQty;
+  totalEl.textContent = total;
+}
+function incr(k){ if(!cart[k]) return; cart[k].qty++; cart[k].addedAt = new Date().toISOString(); save(); flashCart(); }
+function decr(k){ if(!cart[k]) return; cart[k].qty = Math.max(1, cart[k].qty-1); cart[k].addedAt = new Date().toISOString(); save(); flashCart(); }
+function removeItem(k){ delete cart[k]; save(); flashCart(); }
+function clearCart(){ cart = {}; save(); renderCart(); }
+function flashCart(){ const cb = document.getElementById('cartbar'); if(!cb) return; cb.classList.remove('hidden'); setTimeout(()=>cb.classList.add('visible'), 20); setTimeout(()=>cb.classList.remove('visible'), 800); }
+
+/* ================ Lightbox ================ */
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightboxImg');
+function previewImage(src){ lightboxImg.src = src; lightbox.style.display = 'flex'; }
+function closeLightbox(){ lightbox.style.display = 'none'; lightboxImg.src = ''; }
+document.addEventListener('click',(e)=>{ const img = e.target.closest('.media img'); if(img) previewImage(img.src); });
+document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') closeLightbox(); });
+
+/* ================ PDF generation (buyer receipt) ================ */
+async function generatePDFReturnDataURI(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'pt', format:'a4'});
+  doc.setFont('Helvetica');
+  doc.setFontSize(20);
+  doc.text('Season 1 — Order Receipt', 40, 56);
+  doc.setFontSize(12);
+  doc.text('Nakuru City — Call to confirm: 0745955707', 40, 80);
+  doc.setFontSize(12);
+  doc.text('Date: ' + new Date().toLocaleString(), 40, 102);
+  doc.setLineWidth(0.6);
+  doc.line(40,114,555,114);
+
+  let y = 136;
+  doc.setFontSize(12);
+  let total = 0;
+  const keys = Object.keys(cart);
+  if(!keys.length) { doc.text('Cart is empty', 40, y); return doc.output('datauristring'); }
+
+  doc.text('Items to be delivered:', 40, y); y += 20;
+  keys.forEach(k=>{
+    const it = cart[k];
+    const sub = it.price * it.qty; total += sub;
+    doc.setFontSize(12);
+    doc.text(`${it.name} — KSh ${it.price} x ${it.qty} = KSh ${sub}`, 40, y); y += 16;
+    if(it.extras && it.extras.length){
+      doc.setFontSize(10);
+      doc.text(`Extras: ${it.extras.map(e=>e.name).join(', ')}`, 42, y);
+      y += 14;
+      doc.setFontSize(12);
+    }
+    doc.setFontSize(10);
+    doc.text(`Added: ${new Date(it.addedAt).toLocaleString()}`, 42, y);
+    y += 18;
+    if(y > 720){ doc.addPage(); y = 40; }
+  });
+
+  doc.setFontSize(13);
+  doc.text(`Total: KSh ${total}`, 40, y+8);
+  doc.setFontSize(11);
+  doc.text('Please call 0745955707 to confirm delivery and arrange payment.', 40, y+36);
+  doc.setFontSize(12);
+  doc.text('Thank you for ordering Season One Traders — we appreciate your business!', 40, y+66);
+
+  return doc.output('datauristring'); // data:application/pdf;base64,...
+}
+
+/* Download PDF helper */
+async function generatePDF(){
+  const uri = await generatePDFReturnDataURI();
+  const link = document.createElement('a');
+  link.href = uri;
+  link.download = 'season1-order.pdf';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+/* Open + download the PDF */
+function openAndDownloadDataURI(uri, filename='season1-order.pdf'){
+  const arr = uri.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while(n--){ u8arr[n] = bstr.charCodeAt(n); }
+  const blob = new Blob([u8arr], { type: mime });
+  const blobUrl = URL.createObjectURL(blob);
+
+  // open in new tab
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.target = '_blank';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  // trigger download
+  const dl = document.createElement('a');
+  dl.href = blobUrl;
+  dl.download = filename;
+  document.body.appendChild(dl);
+  dl.click();
+  dl.remove();
+
+  setTimeout(()=>URL.revokeObjectURL(blobUrl), 12000);
+}
+
+/* ================ Order modal control ================ */
+let orderModalTimer = null;
+function showOrderModal(durationMs = 30000) {
+  const modal = document.getElementById('orderModal');
+  modal.style.display = 'flex';
+  if(orderModalTimer) clearTimeout(orderModalTimer);
+  orderModalTimer = setTimeout(() => { closeOrderModal(); }, durationMs);
+}
+function closeOrderModal() {
+  const modal = document.getElementById('orderModal');
+  modal.style.display = 'none';
+  if(orderModalTimer) { clearTimeout(orderModalTimer); orderModalTimer = null; }
+}
+
+/* Main order flow */
+async function placeOrderFromCart(){
+  const keys = Object.keys(cart);
+  if(!keys.length){ alert('Cart empty — add items before ordering'); return; }
+
+  // generate PDF data URI
+  let pdfDataUri;
+  try{
+    pdfDataUri = await generatePDFReturnDataURI();
+  }catch(err){
+    console.error('PDF generation failed', err);
+    showPopup('Could not generate receipt PDF. Try again.');
+    return;
+  }
+
+  // open + download the PDF for the buyer
+  try{
+    openAndDownloadDataURI(pdfDataUri, 'season1-order.pdf');
+    showOrderModal(30000);
+    showPopup('Order placed — receipt downloaded. Please call 0745955707 to confirm delivery.', 6000);
+  }catch(err){
+    console.error('Could not open/download PDF', err);
+    showPopup('Order placed but could not auto-download the receipt. Please refresh and download manually.', 7000);
+  }
+
+  // clear cart and save
+  cart = {}; save()
+}
+
+/* helpers */
+function goto(id){ const el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); }
+function showPopup(msg, ms=4500){ const p = document.getElementById('popup'); p.textContent = msg; p.style.display='block'; setTimeout(()=>{ p.style.display='none'; p.textContent=''; }, ms); }
+
+/* CARTBAR: close button behaviour and initial visibility */
+document.addEventListener('DOMContentLoaded', ()=>{
+  const closeBtn = document.getElementById('cartCloseBtn');
+  const cartbar = document.getElementById('cartbar');
+
+  // initial visibility depending on stored cart
+  manageCartbarVisibility();
+
+  if(closeBtn && cartbar){
+    closeBtn.addEventListener('click', ()=>{
+      // hide cart gracefully
+      cartbar.classList.remove('visible');
+      setTimeout(()=>cartbar.classList.add('hidden'), 320);
+    });
+  }
+});
+
+/* openCart helper to reveal cart when user clicks "Order" or similar */
+function openCart(){
+  const cartbar = document.getElementById('cartbar');
+  if(!cartbar) return;
+  cartbar.classList.remove('hidden');
+  setTimeout(()=>cartbar.classList.add('visible'), 20);
+  render();
+  renderCart();
+}
+
+/* init render */
+render();
+renderCart();
+</script>
+</body>
+</html>
