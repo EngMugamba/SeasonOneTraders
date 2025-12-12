@@ -11,6 +11,13 @@
 
 <!-- jsPDF for PDF receipts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+function toggleMenu() {
+  document.getElementById("navLinks").classList.toggle("mobile-open");
+}
+</script>
+
+
 
 <style>
 :root{
@@ -44,22 +51,172 @@ body::after{content:'';position:fixed;inset:0;z-index:0;background:linear-gradie
 
 /* TOP NAV — full width colored band */
 .topband {
-  width:100%;
-  background: linear-gradient(90deg,var(--yellow),var(--green));
-  padding:18px 0;
-  position:fixed;
-  top:0;left:0;z-index:120;
-  box-shadow:0 8px 26px rgba(0,0,0,0.07);
+  width: 100%;
+  background: linear-gradient(90deg, var(--yellow), var(--green));
+  padding: 16px 0;
+  position: fixed;
+  top: 0; left: 0;
+  z-index: 120;
+  box-shadow: 0 8px 26px rgba(0,0,0,0.07);
 }
+
 .topband .inner {
-  max-width:var(--content-width);
-  margin:0 auto; padding:0 18px; display:flex; align-items:center; justify-content:space-between; gap:16px;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-.brand h1{margin:0;font-family:Merriweather;color:var(--black);font-size:1.5rem}
-.tag{font-size:1rem;color:rgba(0,0,0,0.85)}
-.toplinks{display:flex;gap:12px;align-items:center}
-.toplinks a{display:inline-block;padding:10px 14px;border-radius:12px;text-decoration:none;color:var(--black);background:rgba(255,255,255,0.8);font-weight:700;border:1px solid rgba(0,0,0,0.06);box-shadow:0 8px 24px rgba(0,0,0,0.04)}
-.toplinks a:hover{transform:translateY(-3px);transition:transform .14s}
+
+.brand h1 {
+  margin: 0;
+  font-family: Merriweather;
+  font-size: 1.5rem;
+  color: var(--black);
+}
+
+.tag {
+  font-size: 1rem;
+  color: rgba(0,0,0,0.85);
+}
+
+/* Desktop links */
+.toplinks {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.toplinks a {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.8);
+  border: 1px solid rgba(0,0,0,0.06);
+  color: var(--black);
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+}
+
+/* Hamburger icon hidden on desktop */
+.menu-toggle {
+  display: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ------------------ MOBILE MENU STYLE ------------------ */
+@media (max-width: 900px) {
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .toplinks {
+    display: none; /* hidden until opened */
+    position: absolute;
+    top: 70px;
+    right: 18px;
+    background: white;
+    width: 200px;
+    padding: 14px;
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .toplinks.mobile-open {
+    display: flex;
+  }
+
+  .toplinks a {
+    width: 100%;
+    text-align: left;
+  }
+  /* Show hamburger only on mobile */
+.menu-toggle {
+  display: none;
+  font-size: 2rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* DESKTOP: show normal links */
+@media (min-width: 701px) {
+  .toplinks {
+    display: flex !important;
+    gap: 12px;
+    align-items: center;
+  }
+}
+
+/* MOBILE MENU */
+/* MOBILE MENU FIX */
+@media (max-width: 900px) { /* increased breakpoint for landscape phones */
+
+  .menu-toggle {
+    display: block;
+  }
+
+  /* Hide menu by default */
+  .toplinks {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;          /* anchors below the topbar no matter height */
+    right: 16px;
+    background: white;
+    padding: 16px;
+    border-radius: 14px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+    width: 220px;
+    z-index: 200;
+    gap: 12px;
+  }
+
+  /* Show menu when toggled */
+  .toplinks.mobile-open {
+    display: flex;
+  }
+
+  .toplinks a {
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+  }
+
+  /* Brand + tag stacked */
+  .brand {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand h1 {
+    font-size: 1.25rem;
+  }
+
+  .tag {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    display: block !important;
+    margin-top: 2px;
+    white-space: nowrap;
+  }
+
+  /* Keep inner aligned properly */
+  .topband .inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+}
+
+
+
 
 /* page container */
 .page{position:relative;z-index:2;max-width:var(--content-width);margin:calc(var(--gap) * 0.8) auto;padding:0 18px 64px}
@@ -219,15 +376,27 @@ button:focus, a:focus, input:focus{outline:3px solid rgba(31,122,86,0.18);outlin
 <!-- TOP NAV -->
 <div class="topband" role="banner">
   <div class="inner">
+
     <div style="display:flex;gap:12px;align-items:center">
-      <div class="brand"><h1>Season One Traders</h1><div class="tag">Fresh Juices • Nakuru City</div></div>
+      <div class="brand">
+        <h1>Season One Traders</h1>
+        <div class="tag">Fresh Juices • Nakuru City</div>
+      </div>
     </div>
-    <div class="toplinks" role="navigation" aria-label="Main">
+
+    <!-- Mobile Toggle -->
+    <div class="menu-toggle" onclick="toggleMenu()">
+      ☰
+    </div>
+
+    <!-- Links -->
+    <div class="toplinks" id="navLinks" role="navigation" aria-label="Main">
       <a href="#menu" onclick="goto('menu')">Menu</a>
       <a href="#about" onclick="goto('about')">About</a>
       <a href="#commitment" onclick="goto('commitment')">Our Commitment</a>
       <a href="#help" onclick="goto('help')">Help</a>
     </div>
+
   </div>
 </div>
 
@@ -745,3 +914,4 @@ renderCart();
 </script>
 </body>
 </html>
+
